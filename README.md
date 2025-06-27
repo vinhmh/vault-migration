@@ -1,14 +1,20 @@
 # Vault Setup and Migration Guide
 
-## Prerequisites
+This guide provides step-by-step instructions for setting up HashiCorp Vault and migrating data between vault instances.
 
-After updating `docker-compose.yml` and `vault-config.hcl`, start the vault container:
+## 📋 Prerequisites
+
+Before starting, ensure you have:
+- Docker and Docker Compose installed
+- Updated `docker-compose.yml` and `vault-config.hcl` files
+
+Start the vault container:
 
 ```bash
 docker compose up -d vault-prod
 ```
 
-## Initial Setup
+## 🚀 Initial Setup
 
 ### 1. Initialize Vault
 
@@ -18,7 +24,7 @@ Access the new vault container and initialize it:
 vault operator init
 ```
 
-**⚠️ WARNING**: You need to save the unseal keys. If lost, you will lose all secret keys.
+> **⚠️ WARNING**: You need to save the unseal keys. If lost, you will lose all secret keys.
 
 #### Example Output
 
@@ -55,7 +61,7 @@ After successful unsealing:
    vault secrets enable -path=secret kv
    ```
 
-## Migration Process
+## 🔄 Migration Process
 
 ### 1. Exit Container
 
@@ -63,25 +69,30 @@ Exit the vault container after configuration.
 
 ### 2. Prepare Migration
 
-Update the tokens of old and new servers in `migrate.sh` to prepare for migration:
-
+**Step 1: Export data from old vault**
 ```bash
-sh migrate.sh
+sh export.sh
 ```
 
-### 3. Data Migration
+**Step 2: Import data to new vault**
+```bash
+sh import.sh
+```
 
-- **Export data from old vault**
-- **Import data to new vault**
+## 📁 Project Files
 
-## Files
+| File | Description |
+|------|-------------|
+| `docker-compose.yaml` | Docker Compose configuration |
+| `vault-config.hcl` | Vault configuration file |
+| `export.sh` | Export script for vault data |
+| `import.sh` | Import script for vault data |
 
-- `docker-compose.yaml` - Docker Compose configuration
-- `vault-config.hcl` - Vault configuration file
-- `migrate.sh` - Migration script
-- `export.sh` - Export script
-- `import.sh` - Import script
+## 🔒 Security Notes
 
-## Security Notes
+> **⚠️ Important**: Never commit actual Vault tokens or unseal keys to version control. Always use environment variables or secure secret management for production tokens.
 
-⚠️ **Important**: Never commit actual Vault tokens or unseal keys to version control. Always use environment variables or secure secret management for production tokens. 
+## 📚 Additional Resources
+
+- [HashiCorp Vault Documentation](https://www.vaultproject.io/docs)
+- [Vault CLI Reference](https://www.vaultproject.io/docs/commands)
