@@ -1,7 +1,7 @@
 #!/bin/bash
 
 OLD_VAULT_ADDR="http://127.0.0.1:8200"
-OLD_VAULT_TOKEN="root-token"
+OLD_VAULT_TOKEN="YOUR_OLD_VAULT_TOKEN"
 SECRET_PATH="secret"
 
 mkdir -p export
