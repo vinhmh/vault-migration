@@ -1,6 +1,6 @@
 # Vault Setup and Migration Guide
 
-> **⚠️ WARNING**: Do not run `docker compose down` during migration as it will stop the vault containers and potentially lose data. Use `docker compose stop` instead if you need to pause the services temporarily.
+> **⚠️ WARNING**: Do not run `docker compose down` during migration as it will stop the vault containers and potentially lose data.
 
 This guide provides step-by-step instructions for setting up HashiCorp Vault and migrating data between vault instances.
 
@@ -87,11 +87,19 @@ After successful unsealing:
    vault secrets enable -path=secret --version=2 kv
    ```
 
+## 🔧 Environment Configuration
+
+After setting up your vault, update API, Jobs environment variables:
+
+```bash
+# For jobs, API
+VAULT_URL='http://vault-prod:8200'
+VAULT_TOKEN='YOUR_NEW_VAULT_TOKEN'
+```
+
+**Note**: Replace `YOUR_NEW_VAULT_TOKEN` with the actual root token from your vault initialization.
+
 ## 🔄 Migration Process
-
-### 1. Exit Container
-
-Exit the vault container after configuration.
 
 ### 2. Prepare Migration
 
