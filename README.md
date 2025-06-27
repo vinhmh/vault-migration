@@ -1,5 +1,7 @@
 # Vault Setup and Migration Guide
 
+> **⚠️ WARNING**: Do not run `docker compose down` during migration as it will stop the vault containers and potentially lose data. Use `docker compose stop` instead if you need to pause the services temporarily.
+
 This guide provides step-by-step instructions for setting up HashiCorp Vault and migrating data between vault instances.
 
 ## 📋 Prerequisites
@@ -7,6 +9,30 @@ This guide provides step-by-step instructions for setting up HashiCorp Vault and
 Before starting, ensure you have:
 - Docker and Docker Compose installed
 - Updated `docker-compose.yml` and `vault-config.hcl` files
+
+### Docker Compose Configuration
+
+Make sure your `docker-compose.yml` includes the `vault-prod` service:
+
+```yaml
+vault-prod:
+  image: hashicorp/vault:latest
+  ports:
+    - "8201:8200"
+  volumes:
+    - vault-prod-data:/vault/data        # Volume contains secrets
+    - ./vault-config.hcl:/vault/config/vault-config.hcl
+  cap_add:
+    - IPC_LOCK
+  environment:
+    VAULT_ADDR: http://0.0.0.0:8200
+  command: >
+    sh -c "chown -R 100:100 /vault/data && vault server -config=/vault/config/vault-config.hcl"
+```
+
+**Important**: Don't forget to include the `vault-prod-data` volume in your volumes section.
+
+For the `vault-config.hcl` configuration, please refer to the [vault-config.hcl file](https://github.com/vinhmh/vault-migration/blob/main/vault-config.hcl) in this repository.
 
 Start the vault container:
 
@@ -58,7 +84,7 @@ After successful unsealing:
 
 2. **Enable KV Secrets Engine**:
    ```bash
-   vault secrets enable -path=secret kv
+   vault secrets enable -path=secret --version=2 kv
    ```
 
 ## 🔄 Migration Process
