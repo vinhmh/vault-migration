@@ -126,6 +126,46 @@ sh import.sh
 
 > **⚠️ Important**: Never commit actual Vault tokens or unseal keys to version control. Always use environment variables or secure secret management for production tokens.
 
+## 🔑 Auto Unseal on Restart (Scripted Method)
+
+This project uses a startup script to automatically unseal Vault after a restart, using unseal keys stored in a file.
+
+### How It Works
+
+- The `vault-entrypoint.sh` script is set as the entrypoint for the `vault-prod` container.
+- To set up the scripted auto-unseal:
+  1. Prepare `vault.dockerfile` ([see here](https://github.com/vinhmh/vault-migration/blob/main/vault.dockerfile)).
+  2. Prepare `vault-entrypoint.sh` ([see here](https://github.com/vinhmh/vault-migration/blob/main/vault-entrypoint.sh)).
+  3. Prepare `unseal-keys.txt` (enter your 3 unseal keys) ([see here](https://github.com/vinhmh/vault-migration/blob/main/unseal-keys.txt)).
+  4. Build your custom Vault image:
+     ```bash
+     docker build -t custom-vault:latest -f vault.dockerfile ./
+     ```
+  5. Update your Docker Compose file (see [docker-compose.yaml](https://github.com/vinhmh/vault-migration/blob/main/docker-compose.yaml#L17C1-L31C3)).
+  6. Restart your Docker Compose services:
+     ```bash
+     docker compose up -d vault-prod
+     ```
+  7. Vault will be automatically unsealed and ready for use.
+
+### File Locations
+
+- **Unseal keys:**  
+  `unseal-keys.txt` (mounted to `/vault/keys/unseal-keys.txt` in the container)
+- **Entrypoint script:**  
+  `vault-entrypoint.sh` (mounted to `/vault-entrypoint.sh` in the container)
+
+### Security Note
+
+> **Warning:**  
+> Storing unseal keys in a file is not recommended for production environments. For higher security, use Vault's [Auto Unseal with a KMS provider](https://www.vaultproject.io/docs/concepts/seal#auto-unseal) (see below).
+
+---
+
+#### (Optional) KMS-Based Auto Unseal
+
+For production, consider configuring Vault to use a cloud KMS (AWS, GCP, Azure, etc.) for auto-unseal. This removes the need to store unseal keys and improves security. See the "Setting Up Auto Unseal on Restart" section above for details.
+
 ## 📚 Additional Resources
 
 - [HashiCorp Vault Documentation](https://www.vaultproject.io/docs)

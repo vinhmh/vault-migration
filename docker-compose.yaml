@@ -16,19 +16,19 @@ services:
       - vault-dev-data:/vault
 
   vault-prod:
-    image: hashicorp/vault:latest
+    image: custom-vault:latest
     ports:
       - "8201:8200"
     volumes:
-      - vault-prod-data:/vault/data        # Volume chứa secrets
+      - vault-prod-data:/vault/data
       - ./vault-config.hcl:/vault/config/vault-config.hcl
+      - ./vault-entrypoint.sh:/vault-entrypoint.sh
+      - ./unseal-keys.txt:/vault/keys/unseal-keys.txt
     cap_add:
       - IPC_LOCK
     environment:
       VAULT_ADDR: http://0.0.0.0:8200
-    command: >
-      sh -c "chown -R 100:100 /vault/data && vault server -config=/vault/config/vault-config.hcl"
-  
+    entrypoint: ["/bin/sh", "/vault-entrypoint.sh"]
 
 volumes:
   vault-dev-data:
